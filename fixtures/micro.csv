@@ -1,0 +1,11 @@
+﻿来源,是否需要翻译,简体中文,英语,日语,未知列,上下文
+demo,TRUE,"按钮,按""下""",,,保留A,菜单
+demo,TRUE,"第一行
+第二行",,,保留B,提示
+demo,FALSE,,,,保留C,空源文
+demo,TRUE,开始,,,保留D,主菜单
+demo,TRUE,开始,,,保留E,战斗
+demo,TRUE,你好{1:s.昵称},,,保留F,问候
+demo,TRUE,"<color=#ff0000>红色</color>",,,保留G,富文本
+demo,TRUE,已有译文,Existing translation,,保留H,历史
+demo,TRUE,普通文本,,,保留I,其他

@@ -1,0 +1,22 @@
+{
+  "name": "@wonderland/translator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "vite build", "typecheck": "tsc --noEmit" },
+  "dependencies": {
+    "@wonderland/plugin-ui-sdk": "link:../../../packages/plugin-ui-sdk",
+    "@wonderland/ui": "link:../../../packages/ui",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/react-dom": "19.3.0",
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-react": "6.1.1",
+    "tailwindcss": "4.3.3",
+    "@types/react": "19.3.0",
+    "typescript": "~6.0.0",
+    "vite": "8.3.0"
+  }
+}

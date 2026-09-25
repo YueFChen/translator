@@ -1,0 +1,19 @@
+{
+  "manifestVersion": 2,
+  "id": "translator",
+  "name": "翻译工作台",
+  "version": "0.1.0",
+  "description": "CSV 翻译、术语与记忆管理。",
+  "icon": "languages",
+  "hostCompatibility": { "minCoreVersion": "0.1.0", "maxCoreVersionExclusive": "1.0.0", "protocol": { "minVersion": "1.0.0", "maxVersionExclusive": "2.0.0" } },
+  "platform": { "os": "windows", "architecture": "x86_64", "abi": "msvc" },
+  "ui": {
+    "entry": "ui/index.html",
+    "bridgeCompatibility": { "minVersion": "1.0.0", "maxVersionExclusive": "2.0.0" },
+    "integrations": ["theme.followHost"],
+    "contributions": [{ "id": "main", "kind": "activity", "title": "翻译工作台", "icon": "languages", "defaultOrder": 500 }]
+  },
+  "backend": { "entry": "backend/wonderland-translator.exe", "transport": "stdio-ndjson-v1" },
+  "contract": "contract.json",
+  "capabilities": ["files.pick", "files.export", "network.model", "secrets.plugin"]
+}

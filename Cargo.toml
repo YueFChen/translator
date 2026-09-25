@@ -1,0 +1,59 @@
+[package]
+name = "wonderland-translator"
+description = "多语言翻译插件的契约与入口。"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+wonderland-plugin-sdk = { version = "0.1.0", path = "../../crates/plugin-sdk" }
+url = "2"
+serde.workspace = true
+serde_json.workspace = true
+base64 = "0.22"
+csv = "1"
+sha2 = "0.10"
+rusqlite = { version = "0.40.2", features = ["bundled"] }
+# 作业调度需要并发任务、定时退避与限速。
+tokio.workspace = true
+ts-rs = { workspace = true, optional = true }
+
+[features]
+bindings = ["dep:ts-rs"]
+
+[dev-dependencies]
+# Model transport integration checks are compiled only for this plugin's tests.
+wonderland-net = { version = "0.1.0", path = "../../crates/net" }
+
+[[example]]
+name = "generate_bindings"
+required-features = ["bindings"]
+
+[workspace]
+resolver = "3"
+members = [
+    "."
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.98"
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+ts-rs = { version = "12", features = ["serde-json-impl"] }
+# 日志门面：内核重新导出宏与 `instrument`，工作区不直连 tracing（ADR-002）。
+# `attributes` 是 `instrument` 的来源，显式列出以免被别处的 default-features = false 影响。
+tracing = { version = "0.1", features = ["attributes"] }
+# 日志实现：只有 crates/logging 使用，插件与其它 crate 不得依赖（ADR-002）。
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "ansi"] }
+tracing-appender = "0.2"
+# 输出层脱敏。
+regex = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "time", "sync"] }

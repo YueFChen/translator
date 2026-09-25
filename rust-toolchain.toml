@@ -1,0 +1,8 @@
+# 浠撳簱寮€鍙戜笌鍙戝竷浣跨敤鐨勭簿纭伐鍏烽摼銆?
+# 鑱岃矗鍖哄垎锛氭湰鏂囦欢鍥哄畾绮剧‘宸ュ叿閾撅紱鍚?crate 鐨?rust-version 琛ㄧず婧愮爜 MSRV銆?
+
+[toolchain]
+channel = "1.98.1"
+profile = "minimal"
+components = ["rustfmt", "clippy"]
+targets = ["x86_64-pc-windows-msvc"]

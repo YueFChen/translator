@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@wonderland/ui/theme.css";
+@import "./style.css";
+
+html, body, #root { width: 100%; height: 100%; min-width: 0; margin: 0; }
+body { color: var(--app-ink); background: transparent; }
+.tr-drawer-backdrop { position: fixed; z-index: 100; inset: 0; display: flex; justify-content: flex-end; background: rgb(0 0 0 / 30%); }
+.tr-drawer-panel { display: flex; width: min(680px, 92vw); height: 100%; min-height: 0; flex-direction: column; overflow: auto; border-left: 1px solid var(--app-glass-line-strong); background: var(--app-field); box-shadow: -16px 0 48px rgb(0 0 0 / 18%); }
+.tr-drawer-head { position: sticky; z-index: 1; top: 0; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--app-glass-line); background: var(--app-field); }
+.tr-drawer-head h2 { font-size: 1rem; font-weight: 700; }

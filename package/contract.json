@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "$defs": {
+    "params": { "type": "object", "additionalProperties": true },
+    "result": { "type": ["object", "array", "string", "integer", "number", "boolean", "null"] }
+  },
+  "methods": {
+    "work_tree": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "rename_work": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "open_work": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 30000 },
+    "csv_page": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "work_job_progress": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "export_work_drafts": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 30000 },
+    "provider_profiles": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "save_profile": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "activate_profile": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "delete_profile": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "choose_file": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 60000 },
+    "prepare": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 30000 },
+    "export": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 30000 },
+    "memory_entries": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "disable_memory": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "glossary_terms": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "save_term": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "disable_term": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 },
+    "job_start": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 86400000 },
+    "job_resume_selected": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 86400000 },
+    "job_pause": { "params": { "$ref": "#/$defs/params" }, "result": { "$ref": "#/$defs/result" }, "timeoutMs": 10000 }
+  },
+  "events": {
+    "job.progress": { "payload": { "type": "object", "additionalProperties": true } },
+    "job.log": { "payload": { "type": "object", "required": ["lines"], "properties": { "lines": { "type": "array", "items": { "type": "string", "maxLength": 2048 }, "maxItems": 1000 } }, "additionalProperties": false } }
+  }
+}
