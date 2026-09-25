@@ -6,7 +6,15 @@ import path from 'node:path'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 if (process.platform !== 'win32' || process.arch !== 'x64') throw new Error('The translator package currently targets Windows x86_64 MSVC.')
 function run(command, args) {
-  const result = spawnSync(command, args, { cwd: root, stdio: 'inherit', shell: process.platform === 'win32' })
+  const useWindowsShim = process.platform === 'win32' && command === 'pnpm'
+  const commandName = useWindowsShim ? (process.env.ComSpec ?? 'cmd.exe') : command
+  const commandArgs = useWindowsShim
+    ? ['/d', '/s', '/c', ['pnpm.cmd', ...args].map((arg) => {
+        if (!/^[\w./:-]+$/.test(arg)) throw new Error(`Unsupported Windows command argument: ${arg}`)
+        return arg
+      }).join(' ')]
+    : args
+  const result = spawnSync(commandName, commandArgs, { cwd: root, stdio: 'inherit' })
   if (result.status !== 0) process.exit(result.status ?? 1)
 }
 run('pnpm', ['--dir', 'ui', 'run', 'build'])

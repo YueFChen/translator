@@ -1,4 +1,4 @@
-> This is an independently versioned plugin repository. Local builds use the stable Core SDK from the adjacent `Wonderland_Assistant` checkout; see [Core repository boundaries](../../Wonderland_Assistant/docs/REPOSITORY-BOUNDARIES.md).
+> This is an independently versioned plugin repository. Local builds use the stable Core SDK from this checkout; see [Core repository boundaries](../../docs/REPOSITORY-BOUNDARIES.md).
 
     # 翻译插件：当前实现
 
@@ -74,7 +74,7 @@ cargo clippy -p wonderland-translator --all-targets -- -D warnings
 cargo run -p wonderland-translator --example generate_bindings --features bindings -- --check
 pnpm typecheck
 pnpm build
-pnpm run check:ui-literals
+pnpm --dir ..\.. run check:ui-literals
 ```
 
 `fixtures/micro.csv` 是可提交的合成样本。可用 `TRANSLATOR_REFERENCE_CSV` 指向本机真实样本执行额外回归；真实样本及第三方语料不进入仓库。Rust DTO 修改后运行绑定生成器（去掉 `--check`）更新 `ui/src/types.generated.ts`。

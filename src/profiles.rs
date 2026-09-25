@@ -5,6 +5,10 @@ use crate::secrets::SecretStore;
 use crate::store::Store;
 use crate::{ProviderConfig, ProviderConfigInput, ProviderProfile};
 
+fn err(error: impl std::fmt::Display) -> String {
+    error.to_string()
+}
+
 fn to_view(settings: &ProviderSettings, has_key: bool) -> ProviderConfig {
     ProviderConfig {
         base_url: settings.base_url.clone(),

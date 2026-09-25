@@ -7,7 +7,7 @@
 .tr-primary { background: var(--app-accent-soft); border-color: var(--app-accent-line); color: var(--app-accent-ink); }
 .tr-error { padding: 12px; border: 1px solid var(--app-danger-line); border-radius: 9px; background: var(--app-danger-soft); color: var(--app-danger); overflow-wrap: anywhere; }
 
-.tr-workspace { width: 100%; min-width: 0; height: 100%; min-height: 0; overflow: hidden; display: grid; grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); gap: 10px; color: var(--app-ink); }
+.tr-workspace { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; min-height: 0; padding-inline: var(--app-page-gutter, 24px); overflow: hidden; display: grid; grid-template-columns: minmax(220px, 260px) minmax(0, 1fr); gap: 10px; color: var(--app-ink); }
 .tr-workspace[data-history-collapsed='true'] { grid-template-columns: 56px minmax(0, 1fr); }
 .tr-worktree, .tr-workmain { min-width: 0; min-height: 0; }
 .tr-worktree { display: flex; flex-direction: column; border: 1px solid var(--app-glass-line); border-radius: 14px; background: var(--app-glass-subtle); overflow: hidden; transition: width .2s ease; }
