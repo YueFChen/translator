@@ -1,3 +1,4 @@
+import './check-core-compatibility.mjs'
 import { cp, mkdir, rm } from 'node:fs/promises'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'

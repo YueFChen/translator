@@ -32,7 +32,7 @@ fn run() -> Result<(), String> {
     let runtime = Arc::new(tokio::runtime::Builder::new_multi_thread().worker_threads(4).enable_all().build()
         .map_err(|error| error.to_string())?);
 
-    serve("translator", "0.1.0", CONTRACT, move |host, method, params, request_id| {
+    serve("translator", env!("CARGO_PKG_VERSION"), CONTRACT, move |host, method, params, request_id| {
         services.set_host(host.clone());
         dispatch(&host, &translator, &data_dir, &runtime, &active_job, &method, params, request_id)
             .map_err(|error| PluginError::new(

@@ -2,10 +2,10 @@
   "manifestVersion": 2,
   "id": "translator",
   "name": "翻译工作台",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CSV 翻译、术语与记忆管理。",
   "icon": "languages",
-  "hostCompatibility": { "minCoreVersion": "0.1.0", "maxCoreVersionExclusive": "1.0.0", "protocol": { "minVersion": "1.0.0", "maxVersionExclusive": "2.0.0" } },
+  "hostCompatibility": { "minCoreVersion": "0.1.8", "maxCoreVersionExclusive": "1.0.0", "protocol": { "minVersion": "1.0.0", "maxVersionExclusive": "2.0.0" } },
   "platform": { "os": "windows", "architecture": "x86_64", "abi": "msvc" },
   "ui": {
     "entry": "ui/index.html",

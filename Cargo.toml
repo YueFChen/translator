@@ -8,7 +8,7 @@ license.workspace = true
 publish.workspace = true
 
 [dependencies]
-wonderland-plugin-sdk = { version = "0.1.0", path = "../../crates/plugin-sdk" }
+wonderland-plugin-sdk = { version = "0.1.8", path = "../../crates/plugin-sdk" }
 url = "2"
 serde.workspace = true
 serde_json.workspace = true
@@ -25,7 +25,7 @@ bindings = ["dep:ts-rs"]
 
 [dev-dependencies]
 # Model transport integration checks are compiled only for this plugin's tests.
-wonderland-net = { version = "0.1.0", path = "../../crates/net" }
+wonderland-net = { version = "0.1.8", path = "../../crates/net" }
 
 [[example]]
 name = "generate_bindings"
@@ -38,7 +38,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 rust-version = "1.98"
 license = "Apache-2.0"
