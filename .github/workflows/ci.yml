@@ -1,0 +1,112 @@
+name: Plugin CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: translator-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-package:
+    name: Check and package Windows x64 plugin
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: core/plugins/translator
+    steps:
+      - name: Checkout pinned Core SDK
+        uses: actions/checkout@v7
+        with:
+          repository: YueFChen/Wonderland_Assistant
+          ref: dc988400c4d66ec1c25a5221583efaf80c80db0b
+          path: core
+          persist-credentials: false
+
+      - name: Checkout plugin
+        uses: actions/checkout@v7
+        with:
+          path: core/plugins/translator
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.27.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+          cache: pnpm
+          cache-dependency-path: |
+            core/pnpm-lock.yaml
+            core/plugins/translator/pnpm-lock.yaml
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          targets: x86_64-pc-windows-msvc
+          components: rustfmt, clippy
+
+      - name: Install pinned Core workspace dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: core
+
+      - name: Install locked plugin dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check UI types and build
+        run: pnpm run check
+
+      - name: Check Rust formatting
+        run: cargo fmt --all --check
+
+      - name: Run Rust clippy
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
+
+      - name: Check generated UI bindings
+        run: cargo run --locked --example generate_bindings --features bindings -- --check
+
+      - name: Run Rust tests
+        run: cargo test --locked
+
+      - name: Build release package
+        run: pnpm run build:release
+
+      - name: Verify archived package contents and checksums
+        run: |
+          $manifest = Get-Content -Raw 'package/manifest.json' | ConvertFrom-Json
+          $packageName = "$($manifest.id)-$($manifest.version)-windows-$($manifest.platform.architecture).wplug"
+          $packagePath = Join-Path (Get-Location) (Join-Path 'target' $packageName)
+          if (-not (Test-Path -LiteralPath $packagePath -PathType Leaf)) {
+            throw "Release package missing: $packagePath"
+          }
+          $packageSize = (Get-Item -LiteralPath $packagePath).Length
+          if ($packageSize -lt 1 -or $packageSize -gt (100 * 1024 * 1024)) {
+            throw 'The .wplug archive must be between 1 byte and 100 MiB.'
+          }
+          $extractRoot = Join-Path $env:RUNNER_TEMP ("translator-package-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT")
+          if (Test-Path -LiteralPath $extractRoot) {
+            throw "Package verification directory already exists: $extractRoot"
+          }
+          New-Item -ItemType Directory -Path $extractRoot | Out-Null
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          [System.IO.Compression.ZipFile]::ExtractToDirectory($packagePath, $extractRoot)
+          node scripts/verify-release-package.mjs $extractRoot
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: translator-package
+          path: core/plugins/translator/target/translator-*.wplug
+          if-no-files-found: error
+          retention-days: 7

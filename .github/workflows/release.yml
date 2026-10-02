@@ -1,0 +1,97 @@
+name: Plugin release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: translator-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    name: Sign update manifest and publish release
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Checkout plugin release source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+
+      - name: Download verified package
+        uses: actions/download-artifact@v4
+        with:
+          name: translator-package
+          path: release-artifact
+
+      - name: Verify release tag and signing key availability
+        shell: pwsh
+        env:
+          PLUGIN_UPDATE_SIGNING_KEY: ${{ secrets.PLUGIN_UPDATE_SIGNING_KEY }}
+          PLUGIN_UPDATE_SIGNING_PUBLIC_KEY: ${{ vars.PLUGIN_UPDATE_SIGNING_PUBLIC_KEY }}
+        run: |
+          $manifest = Get-Content -Raw 'package/manifest.json' | ConvertFrom-Json
+          if ($env:GITHUB_REF_NAME -ne "v$($manifest.version)") {
+            throw 'Tag and plugin manifest version differ.'
+          }
+          if ([string]::IsNullOrWhiteSpace($env:PLUGIN_UPDATE_SIGNING_KEY)) {
+            throw 'PLUGIN_UPDATE_SIGNING_KEY secret is missing.'
+          }
+          if ($env:PLUGIN_UPDATE_SIGNING_PUBLIC_KEY -notmatch '^[a-f0-9]{64}$') {
+            throw 'PLUGIN_UPDATE_SIGNING_PUBLIC_KEY repository variable is missing or invalid.'
+          }
+
+      - name: Create signed update manifest
+        shell: pwsh
+        env:
+          PLUGIN_UPDATE_SIGNING_KEY: ${{ secrets.PLUGIN_UPDATE_SIGNING_KEY }}
+          PLUGIN_UPDATE_SIGNING_PUBLIC_KEY: ${{ vars.PLUGIN_UPDATE_SIGNING_PUBLIC_KEY }}
+        run: |
+          $manifest = Get-Content -Raw 'package/manifest.json' | ConvertFrom-Json
+          $packageName = "$($manifest.id)-$($manifest.version)-windows-$($manifest.platform.architecture).wplug"
+          $packagePath = Join-Path 'release-artifact' $packageName
+          if (-not (Test-Path -LiteralPath $packagePath -PathType Leaf)) {
+            throw "Verified package artifact missing: $packagePath"
+          }
+          New-Item -ItemType Directory -Path 'release-output' | Out-Null
+          $manifestArgs = @(
+            'package/manifest.json',
+            $packagePath,
+            $env:GITHUB_REPOSITORY,
+            $env:GITHUB_REF_NAME,
+            'release-output/translator-update.json'
+          )
+          node scripts/create-update-manifest.mjs @manifestArgs
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $manifest = Get-Content -Raw 'package/manifest.json' | ConvertFrom-Json
+          $packageName = "$($manifest.id)-$($manifest.version)-windows-$($manifest.platform.architecture).wplug"
+          $releaseArgs = @(
+            $env:GITHUB_REF_NAME,
+            (Join-Path 'release-artifact' $packageName),
+            'release-output/translator-update.json',
+            '--repo',
+            $env:GITHUB_REPOSITORY,
+            '--title',
+            "$($manifest.name) v$($manifest.version)",
+            '--generate-notes',
+            '--verify-tag'
+          )
+          gh release create @releaseArgs

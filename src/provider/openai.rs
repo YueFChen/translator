@@ -10,8 +10,8 @@ use crate::ProviderCapabilities;
 use crate::config::{MAX_INPUT_CHARS, ProviderSettings};
 use crate::provider::prompt::{build_prompt, params_of, parse_translations, parse_usage};
 use crate::provider::{
-    BatchRequest, BatchResponse, ProviderError, ProviderFuture, TranslatedItem, TranslatorProvider,
-    ModelTransport,
+    BatchRequest, BatchResponse, ModelTransport, ProviderError, ProviderFuture, TranslatedItem,
+    TranslatorProvider,
 };
 
 /// OpenAI 兼容适配器。
@@ -24,7 +24,11 @@ pub struct OpenAiCompatibleProvider {
 }
 
 impl OpenAiCompatibleProvider {
-    pub fn new(settings: &ProviderSettings, secret_id: i64, transport: Arc<dyn ModelTransport>) -> Result<Self, ProviderError> {
+    pub fn new(
+        settings: &ProviderSettings,
+        secret_id: i64,
+        transport: Arc<dyn ModelTransport>,
+    ) -> Result<Self, ProviderError> {
         Ok(Self {
             transport,
             secret_id,

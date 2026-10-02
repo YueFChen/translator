@@ -1,7 +1,7 @@
+use ts_rs::{Config, TS};
 use wonderland_translator::*;
 
-const HEADER: &str =
-    "// Generated from Rust by examples/generate_bindings.rs. Do not edit.\n";
+const HEADER: &str = "// Generated from Rust by examples/generate_bindings.rs. Do not edit.\n";
 
 fn main() {
     let cfg = Config::default();
@@ -47,11 +47,12 @@ fn main() {
             .collect::<Vec<_>>()
             .join("\n")
     );
-    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("ui/src/types.generated.ts");
+    let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("ui/src/types.generated.ts");
     if std::env::args().any(|arg| arg == "--check") {
         assert_eq!(
-            std::fs::read_to_string(path).expect("generated file"),
+            std::fs::read_to_string(path)
+                .expect("generated file")
+                .replace("\r\n", "\n"),
             out,
             "Bindings drift: regenerate bindings"
         );

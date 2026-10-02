@@ -147,11 +147,21 @@ fn validate_endpoint(base_url: &str, allow_loopback: bool) -> Result<(), String>
     if !url.username().is_empty() || url.password().is_some() {
         return Err("模型服务配置错误：地址不得包含用户名或密码".into());
     }
-    let host = url.host_str().filter(|host| !host.is_empty())
+    let host = url
+        .host_str()
+        .filter(|host| !host.is_empty())
         .ok_or_else(|| "模型服务配置错误：地址缺少主机名".to_owned())?;
     match url.scheme() {
         "https" => Ok(()),
-        "http" if allow_loopback && matches!(host.to_ascii_lowercase().as_str(), "127.0.0.1" | "localhost" | "[::1]" | "::1") => Ok(()),
+        "http"
+            if allow_loopback
+                && matches!(
+                    host.to_ascii_lowercase().as_str(),
+                    "127.0.0.1" | "localhost" | "[::1]" | "::1"
+                ) =>
+        {
+            Ok(())
+        }
         "http" => Err("模型服务配置错误：仅允许 https；本机联调需显式允许回环地址".into()),
         other => Err(format!("模型服务配置错误：不支持的协议：{other}")),
     }

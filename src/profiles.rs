@@ -152,7 +152,11 @@ pub fn save(
     })
 }
 
-pub fn activate(store: &Store, secret_store: &dyn SecretStore, id: i64) -> Result<ProviderProfile, String> {
+pub fn activate(
+    store: &Store,
+    secret_store: &dyn SecretStore,
+    id: i64,
+) -> Result<ProviderProfile, String> {
     let json: String = store
         .conn()
         .query_row(

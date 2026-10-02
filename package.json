@@ -9,6 +9,8 @@
   },
   "scripts": {
     "build": "node scripts/build-plugin.mjs",
-    "typecheck": "pnpm --dir ui run typecheck"
+    "typecheck": "pnpm --dir ui run typecheck",
+    "build:release": "node scripts/build-plugin.mjs --release --archive",
+    "check": "pnpm run typecheck && pnpm --dir ui run build"
   }
 }

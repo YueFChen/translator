@@ -115,7 +115,8 @@ impl std::error::Error for ProviderError {}
 pub type ProviderFuture<'a> =
     Pin<Box<dyn Future<Output = Result<BatchResponse, ProviderError>> + Send + 'a>>;
 
-pub type TransportFuture<'a> = Pin<Box<dyn Future<Output = Result<Vec<u8>, ProviderError>> + Send + 'a>>;
+pub type TransportFuture<'a> =
+    Pin<Box<dyn Future<Output = Result<Vec<u8>, ProviderError>> + Send + 'a>>;
 
 /// Model requests are sent through the Core host service. `secret_id` is a namespaced reference;
 /// the provider never receives the key itself.

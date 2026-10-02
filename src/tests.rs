@@ -2,6 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 
+use crate::SecretStore;
 use crate::csvio;
 use crate::engine;
 use crate::qa;
@@ -296,9 +297,17 @@ fn provider_profiles_keep_separate_active_configurations() {
 struct FakeSecrets(std::sync::Mutex<std::collections::HashMap<i64, String>>);
 
 impl crate::secrets::SecretStore for FakeSecrets {
-    fn has(&self, id: i64) -> Result<bool, String> { Ok(self.0.lock().unwrap().contains_key(&id)) }
-    fn set(&self, id: i64, value: &str) -> Result<(), String> { self.0.lock().unwrap().insert(id, value.to_owned()); Ok(()) }
-    fn delete(&self, id: i64) -> Result<(), String> { self.0.lock().unwrap().remove(&id); Ok(()) }
+    fn has(&self, id: i64) -> Result<bool, String> {
+        Ok(self.0.lock().unwrap().contains_key(&id))
+    }
+    fn set(&self, id: i64, value: &str) -> Result<(), String> {
+        self.0.lock().unwrap().insert(id, value.to_owned());
+        Ok(())
+    }
+    fn delete(&self, id: i64) -> Result<(), String> {
+        self.0.lock().unwrap().remove(&id);
+        Ok(())
+    }
 }
 
 #[test]

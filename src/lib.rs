@@ -23,10 +23,10 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
+pub use provider::{ModelTransport, ProviderError, TransportFuture};
+pub use secrets::SecretStore;
 use store::Store;
 use wonderland_plugin_sdk::PluginFailure;
-pub use secrets::SecretStore;
-pub use provider::{ModelTransport, ProviderError, TransportFuture};
 
 pub struct Translator {
     data_dir: PathBuf,
@@ -50,7 +50,11 @@ impl Drop for BusyGuard<'_> {
 }
 
 impl Translator {
-    pub fn new(data_dir: PathBuf, secrets: Arc<dyn SecretStore>, model_transport: Arc<dyn ModelTransport>) -> Self {
+    pub fn new(
+        data_dir: PathBuf,
+        secrets: Arc<dyn SecretStore>,
+        model_transport: Arc<dyn ModelTransport>,
+    ) -> Self {
         Self {
             data_dir,
             selected: Mutex::new(None),
@@ -201,14 +205,23 @@ impl Translator {
     }
 
     /// Import bytes from a short-lived Core file handle into the plugin-owned data area.
-    pub fn select_file_contents(&self, name: &str, bytes: &[u8]) -> Result<CsvInspection, PluginFailure> {
-        if !name.to_ascii_lowercase().ends_with(".csv") || bytes.len() > csvio::MAX_FILE_BYTES as usize {
+    pub fn select_file_contents(
+        &self,
+        name: &str,
+        bytes: &[u8],
+    ) -> Result<CsvInspection, PluginFailure> {
+        if !name.to_ascii_lowercase().ends_with(".csv")
+            || bytes.len() > csvio::MAX_FILE_BYTES as usize
+        {
             return Err(PluginFailure::InvalidInput);
         }
         static NEXT_INPUT: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
         let incoming = self.data_dir.join("incoming");
         fs::create_dir_all(&incoming).map_err(|error| PluginFailure::Other(error.to_string()))?;
-        let path = incoming.join(format!("import-{}.csv", NEXT_INPUT.fetch_add(1, Ordering::Relaxed)));
+        let path = incoming.join(format!(
+            "import-{}.csv",
+            NEXT_INPUT.fetch_add(1, Ordering::Relaxed)
+        ));
         fs::write(&path, bytes).map_err(|error| PluginFailure::Other(error.to_string()))?;
         self.select_file(&path)
     }
@@ -288,7 +301,9 @@ impl Translator {
             })
             .map_err(|error| PluginFailure::Other(error.to_string()))?;
         if owner != work_id {
-            return Err(PluginFailure::Other("翻译任务不属于当前 CSV 工作记录".into()));
+            return Err(PluginFailure::Other(
+                "翻译任务不属于当前 CSV 工作记录".into(),
+            ));
         }
         engine::export_with_store(
             &prepared,
@@ -372,8 +387,12 @@ impl Translator {
         if !self.secrets.has(profile_id).map_err(PluginFailure::Other)? {
             return Err(PluginFailure::Other("请先配置模型服务的 API Key".into()));
         }
-        let adapter = provider::OpenAiCompatibleProvider::new(&settings, profile_id, self.model_transport.clone())
-            .map_err(|error| PluginFailure::Other(error.to_string()))?;
+        let adapter = provider::OpenAiCompatibleProvider::new(
+            &settings,
+            profile_id,
+            self.model_transport.clone(),
+        )
+        .map_err(|error| PluginFailure::Other(error.to_string()))?;
         Ok(Arc::new(adapter))
     }
 
@@ -459,7 +478,8 @@ impl Translator {
                 .lock()
                 .map_err(|_| PluginFailure::NotInitialized)?
                 .ok_or_else(|| PluginFailure::Other("请先选择 CSV 工作记录".into()))?;
-            let job_id = resume_id.ok_or_else(|| PluginFailure::Other("请先选择翻译任务".into()))?;
+            let job_id =
+                resume_id.ok_or_else(|| PluginFailure::Other("请先选择翻译任务".into()))?;
             if !job::resumable_exact_job(&store, job_id, work_id, &hash)
                 .map_err(PluginFailure::Other)?
             {

@@ -15,7 +15,9 @@ use tokio::net::{TcpListener, TcpStream};
 use crate::config::ProviderSettings;
 use crate::engine;
 use crate::job::{self, ContextSources, JobControl};
-use crate::provider::{ModelTransport, OpenAiCompatibleProvider, ProviderError, TransportFuture, TranslatorProvider};
+use crate::provider::{
+    ModelTransport, OpenAiCompatibleProvider, ProviderError, TranslatorProvider, TransportFuture,
+};
 use crate::store::Store;
 use crate::tests::TestDir;
 use crate::{JobLimits, JobStatus, Locale, TargetColumn};
@@ -328,14 +330,27 @@ fn settings(base_url: &str, timeout_seconds: u32) -> ProviderSettings {
 
 fn provider(base_url: &str, timeout_seconds: u32) -> Arc<dyn TranslatorProvider> {
     Arc::new(
-        OpenAiCompatibleProvider::new(&settings(base_url, timeout_seconds), 1, Arc::new(DirectModelTransport)).unwrap(),
+        OpenAiCompatibleProvider::new(
+            &settings(base_url, timeout_seconds),
+            1,
+            Arc::new(DirectModelTransport),
+        )
+        .unwrap(),
     )
 }
 
 struct DirectModelTransport;
 
 impl ModelTransport for DirectModelTransport {
-    fn post_json<'a>(&'a self, base_url: &'a str, allow_loopback: bool, timeout_seconds: u32, _secret_id: i64, path: &'a str, body: &'a str) -> TransportFuture<'a> {
+    fn post_json<'a>(
+        &'a self,
+        base_url: &'a str,
+        allow_loopback: bool,
+        timeout_seconds: u32,
+        _secret_id: i64,
+        path: &'a str,
+        body: &'a str,
+    ) -> TransportFuture<'a> {
         Box::pin(async move {
             let endpoint = wonderland_net::ModelEndpoint {
                 base_url: base_url.to_owned(),
@@ -344,14 +359,23 @@ impl ModelTransport for DirectModelTransport {
                 ..wonderland_net::ModelEndpoint::new(base_url)
             };
             let client = wonderland_net::ModelClient::new(endpoint).map_err(test_model_error)?;
-            client.post_json(path, "test-key", body).await.map_err(test_model_error)
+            client
+                .post_json(path, "test-key", body)
+                .await
+                .map_err(test_model_error)
         })
     }
 }
 
 fn test_model_error(error: wonderland_net::ModelError) -> ProviderError {
     match error {
-        wonderland_net::ModelError::Transient { status, retry_after } => ProviderError::Transient { status, retry_after },
+        wonderland_net::ModelError::Transient {
+            status,
+            retry_after,
+        } => ProviderError::Transient {
+            status,
+            retry_after,
+        },
         wonderland_net::ModelError::Indeterminate => ProviderError::Indeterminate,
         wonderland_net::ModelError::Invalid(reason) => ProviderError::Invalid(reason),
         wonderland_net::ModelError::Config(reason) => ProviderError::Config(reason),
